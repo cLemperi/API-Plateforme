@@ -7,11 +7,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+//itemOpération limite les opérations d'api a GET
+
 /**
- * @ApiResource(
- *      normalizationContext={"groups"={"read"}}
- * )
  * @ORM\Entity(repositoryClass=PostRepository::class)
+ * * @ApiResource(
+ *      normalizationContext={"groups"={"read:collection"}},
+ *      itemOperations={"delete",
+ *                      "put"={"denormalization_context"={"groups"={"put:post"}},
+ *                      "get"={
+ *                          "method=GET","requirements"={"id"="\d+"},
+ *                          "normalization_context"={"groups"={"read:collection","read:item","read:Post"}}
+ *      }
+ *    }
+ * }
+ * )
+ *
  */
 class Post
 {
@@ -19,7 +30,7 @@ class Post
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read"})
+     * @Groups({"read:collection"})
      */
     private $id;
 
@@ -40,18 +51,19 @@ class Post
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read"})
+     * @Groups({"read:collection"})
      */
     private $slug;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read"})
+     * @Groups({"read:collection"})
      */
     private $title;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts")
+     * @Groups({"read:collection"})
      */
     private $Category;
 
